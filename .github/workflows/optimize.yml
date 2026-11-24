@@ -1,0 +1,21 @@
+name: Optimisation or
+
+on:
+  workflow_dispatch:
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install yfinance pandas numpy
+      - run: python optimize.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: resultats-optim
+          path: |
+            resultats_optim.txt
+            tous_les_resultats.csv
