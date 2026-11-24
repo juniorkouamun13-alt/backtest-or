@@ -1,0 +1,33 @@
+name: Robot MT5 demo
+
+on:
+  schedule:
+    - cron: "12 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: robot-mt5
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install yfinance pandas numpy metaapi-cloud-sdk
+      - run: python metaapi_bot.py
+        env:
+          METAAPI_TOKEN: ${{ secrets.METAAPI_TOKEN }}
+          METAAPI_ACCOUNT_ID: ${{ secrets.METAAPI_ACCOUNT_ID }}
+          SYMBOL: ${{ secrets.SYMBOL }}
+      - run: |
+          git config user.name "mt5-bot"
+          git config user.email "mt5-bot@users.noreply.github.com"
+          git add -f bot_state.json || true
+          git diff --staged --quiet || (git commit -m "maj robot mt5" && git push)
